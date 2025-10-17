@@ -1,6 +1,7 @@
 # DebIDE
 
-DebIDE is a terminal-native Integrated Development Environment tailored for Debian packaging workflows. It combines a project-aware file explorer, code editor, Debian task runner, and scaffolding helpers inside a single Textual interface.
+DebIDE is a terminal-native Integrated Development Environment tailored for Debian packaging workflows. It combines a project-aware file explorer, code editor, Debian task runner, and scaffolding helpers inside a single Textual interface.<img width="1902" height="1061" alt="Screenshot 2025-10-16 8 21 35 PM" src="https://github.com/user-attachments/assets/5cc17cdf-86f3-4d39-a5cd-7852e30bf683" />
+
 
 ## Highlights
 - Debian-first task palette for `lintian`, `debuild`, `dpkg-buildpackage`, `uscan`, and `sbuild`

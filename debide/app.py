@@ -20,6 +20,7 @@ from textual.widgets import Button, Footer, Header, Input, Label
 from .config import DebIDEConfig, load_config
 from .editor import EditorError, EditorPane
 from .layout import ConsolePane, FileExplorer, TaskDetails, TaskList
+from .plugins import PluginManager
 from .scaffold import PackageMetadata, scaffold_debian_packaging
 from .tasks import TaskSpec
 
@@ -207,10 +208,19 @@ class DebIDEApp(App):
         Binding("ctrl+q", "quit", "Quit"),
     ]
 
-    def __init__(self, workspace: Path, config: DebIDEConfig) -> None:
+    def __init__(
+        self,
+        workspace: Path,
+        config: DebIDEConfig,
+        *,
+        plugin_manager: PluginManager | None = None,
+    ) -> None:
         super().__init__()
         self.workspace = workspace.expanduser().resolve()
         self.config = config
+        self.plugin_manager = plugin_manager or PluginManager()
+        if plugin_manager is None:
+            self.plugin_manager.discover()
         self.editor = EditorPane()
         self.console_view = ConsolePane()
         self.task_list = TaskList(config.tasks)
@@ -232,6 +242,9 @@ class DebIDEApp(App):
 
     def on_mount(self) -> None:
         self._apply_workspace(self.workspace, self.config, announce=False)
+        self._emit_plugin_messages()
+        self.plugin_manager.dispatch_app_ready(self)
+        self._emit_plugin_messages()
 
     def _get_selected_task(self) -> TaskSpec | None:
         task = self.task_list.get_selected_task()
@@ -245,6 +258,24 @@ class DebIDEApp(App):
 
     def _log(self, message: str) -> None:
         self.console_view.write(message, expand=False)
+
+    def _emit_plugin_messages(self) -> None:
+        messages = self.plugin_manager.consume_messages()
+        if not messages:
+            return
+        for message in messages:
+            style = {
+                "info": "cyan",
+                "warning": "yellow",
+                "error": "red",
+            }.get(message.level, "cyan")
+            self.console_view.write(
+                f"[{style}]Plugin {message.source}[/]: {message.text}"
+            )
+            if message.level == "warning":
+                self.notify(f"Plugin {message.source}: {message.text}", severity="warning")
+            elif message.level == "error":
+                self.notify(f"Plugin {message.source}: {message.text}", severity="error")
 
     async def _prompt_save_as(self, editor: EditorPane) -> Path | None:
         initial = ""
@@ -542,11 +573,12 @@ class DebIDEApp(App):
             self.notify(f"{target} is not a directory", severity="error")
             return
         try:
-            config = load_config(target)
+            config = load_config(target, plugin_manager=self.plugin_manager)
         except Exception as error:  # pragma: no cover - configuration errors bubble to UI
             self.notify(str(error), severity="error")
             return
         self._apply_workspace(target, config)
+        self._emit_plugin_messages()
 
     async def _wait_for_modal(
         self, screen: ModalScreen[ModalResult]

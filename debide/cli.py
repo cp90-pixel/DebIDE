@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .app import DebIDEApp
 from .config import load_config
+from .plugins import PluginManager
 from .scaffold import PackageMetadata, scaffold_debian_packaging
 
 
@@ -101,12 +102,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.config_path
         else None
     )
-    config = load_config(workspace, config_path)
-    app = DebIDEApp(workspace=workspace, config=config)
+    plugin_manager = PluginManager()
+    plugin_manager.discover()
+    config = load_config(workspace, config_path, plugin_manager=plugin_manager)
+    app = DebIDEApp(workspace=workspace, config=config, plugin_manager=plugin_manager)
     app.run()
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

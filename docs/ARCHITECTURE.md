@@ -17,6 +17,7 @@ DebIDE is a lightweight, terminal-native Integrated Development Environment that
 - `debide/tasks.py`: Task models, YAML loader, and async runner for Debian tooling commands.
 - `debide/scaffold.py`: Utilities to bootstrap a Debian `debian/` directory from templates.
 - `debide/config.py`: Resolve configuration defaults and project-level overrides.
+- `debide/plugins.py`: Entry-point discovery, task contributions, and lifecycle hooks.
 - `debide/cli.py`: Entry point that parses arguments, selects the workspace directory, and launches the app.
 
 ## Data Flow
@@ -43,4 +44,14 @@ DebIDE is a lightweight, terminal-native Integrated Development Environment that
 - Integrate `gbp` (git-buildpackage) workflows.
 - Provide diff viewer for quilt patches.
 - Offer Snippets/Templates for `debian/control` stanzas.
-- Add plugin hooks for custom project actions.
+- Broaden the plugin API with additional UI integration points.
+
+## Plugin System
+Plugins are regular Python packages that expose a `debide.plugins` entry-point. During CLI startup the `PluginManager` loads each entry, calling `register(api)` with a `PluginAPI` helper. Plugins can:
+
+- statically add task mappings via `api.add_task(mapping)`;
+- provide workspace-dependent tasks with `api.provide_tasks(callback)`;
+- subscribe to the Textual app lifecycle through `api.on_app_ready(callback)`;
+- emit diagnostic messages with `api.info()`, `api.warning()`, or `api.error()`.
+
+Messages from plugins feed into the console log so configuration issues surface alongside build output. Task definitions contributed by plugins are merged with the core defaults before YAML configuration is parsed, allowing user config to override or extend them naturally.

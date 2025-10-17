@@ -56,12 +56,41 @@ tasks:
 
 Any tasks declared here extend or override the built-in defaults.
 
+## Plugins
+DebIDE discovers optional extensions through the `debide.plugins` entry-point group. A plugin exposes a callable `register(api)` (or is itself callable) which receives a `PluginAPI` helper for contributing behaviour.
+
+```toml
+# pyproject.toml
+[project.entry-points."debide.plugins"]
+hello = "example_plugin:register"
+```
+
+```python
+# example_plugin.py
+def register(api):
+    api.add_task(
+        {
+            "name": "hello",
+            "command": "echo hello from a plugin",
+            "description": "Say hello in the console",
+        }
+    )
+
+    def on_ready(app):
+        app.console_view.write("[green]Hello plugin loaded[/green]")
+
+    api.on_app_ready(on_ready)
+```
+
+Use `api.provide_tasks(callback)` when task definitions depend on the active workspace. Plugin log messages appear in the DebIDE console so troubleshooting information sits alongside task output.
+
 ## Project Layout
 - `debide/app.py` – Textual application orchestration
 - `debide/editor.py` – text editor wrapper
 - `debide/layout.py` – reusable UI widgets
 - `debide/tasks.py` – task models and validation
 - `debide/config.py` – configuration loader and merger
+- `debide/plugins.py` – plugin discovery and runtime hooks
 - `debide/scaffold.py` – Debian skeleton generator
 - `docs/ARCHITECTURE.md` – in-depth architectural notes
 

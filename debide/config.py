@@ -9,6 +9,7 @@ from typing import Iterable, Optional, Sequence
 import yaml
 from importlib import resources
 
+from .plugins import PluginManager
 from .tasks import TaskSpec, coerce_tasks, TaskConfigurationError
 
 
@@ -49,11 +50,18 @@ def _load_user_tasks(config_mapping: dict) -> Iterable[dict]:
     return tasks
 
 
-def load_config(workspace: Path, override_config: Optional[Path] = None) -> DebIDEConfig:
+def load_config(
+    workspace: Path,
+    override_config: Optional[Path] = None,
+    *,
+    plugin_manager: Optional[PluginManager] = None,
+) -> DebIDEConfig:
     """Load configuration for the given workspace."""
 
     workspace = workspace.expanduser().resolve()
     raw_tasks = list(_load_default_tasks())
+    if plugin_manager is not None:
+        raw_tasks.extend(plugin_manager.collect_tasks(workspace))
     autosave = False
     default_task: Optional[str] = None
 

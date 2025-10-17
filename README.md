@@ -70,4 +70,4 @@ Any tasks declared here extend or override the built-in defaults.
 - Task output history with search and filter
 
 ## License
-GPL-3.0-or-later. See `LICENSE` for full text.
+Unlicense License. See `LICENSE` for full text.

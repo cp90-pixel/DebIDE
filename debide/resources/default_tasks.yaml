@@ -1,0 +1,16 @@
+tasks:
+  - name: lintian
+    command: lintian --color auto .
+    description: Run lintian checks against the current workspace
+  - name: debuild
+    command: debuild -us -uc
+    description: Build source and binary packages without signing
+  - name: dpkg-buildpackage
+    command: dpkg-buildpackage -us -uc
+    description: Build Debian package using dpkg-buildpackage
+  - name: uscan
+    command: uscan --verbose
+    description: Refresh upstream tarball using uscan/watch
+  - name: sbuild
+    command: sbuild
+    description: Build in a clean sbuild environment

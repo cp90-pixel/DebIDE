@@ -1,0 +1,2 @@
+[console_scripts]
+debide = debide.cli:main

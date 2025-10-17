@@ -1,0 +1,7 @@
+textual<1.0,>=0.48
+pyyaml>=6.0
+rich>=13.7
+
+[dev]
+ruff
+pytest

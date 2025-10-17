@@ -1,0 +1,17 @@
+LICENSE
+README.md
+pyproject.toml
+debide/__init__.py
+debide/app.py
+debide/cli.py
+debide/config.py
+debide/editor.py
+debide/layout.py
+debide/scaffold.py
+debide/tasks.py
+debide.egg-info/PKG-INFO
+debide.egg-info/SOURCES.txt
+debide.egg-info/dependency_links.txt
+debide.egg-info/entry_points.txt
+debide.egg-info/requires.txt
+debide.egg-info/top_level.txt

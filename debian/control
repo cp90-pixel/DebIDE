@@ -1,0 +1,11 @@
+Source: debide
+Section: misc
+Priority: optional
+Maintainer: Debian Maintainer <maintainer@example.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Package: debide
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: DebIDE package
+ Initial Debian package generated via DebIDE.
